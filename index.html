@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noureldin Ahmed — Cloud & DevOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a12;
+  --bg2:#0e0e1a;
+  --indigo:#5b4bd6;
+  --pink:#ff3d9a;
+  --cyan:#2de3d6;
+  --amber:#ffb648;
+  --text:#e9e7f2;
+  --muted:#9490ad;
+  --card:#12111f;
+  --border:rgba(255,255,255,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:80px;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+h1,h2,h3,.logo{font-family:'Syne',sans-serif;}
+
+/* noise overlay */
+.noise{
+  position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.035;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--indigo),var(--pink));border-radius:10px;}
+
+/* custom cursor */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%);}
+.cursor-dot{width:7px;height:7px;background:var(--cyan);box-shadow:0 0 10px var(--cyan),0 0 20px var(--pink);}
+.cursor-ring{width:34px;height:34px;border:1.5px solid rgba(255,255,255,.5);transition:transform .15s ease,border-color .2s,width .2s,height .2s;}
+.cursor-ring.hover{border-color:var(--pink);width:52px;height:52px;}
+@media(hover:none){.cursor-dot,.cursor-ring{display:none;} body{cursor:auto;}}
+
+/* particle canvas */
+#particles{position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 20% 20%,#12102a 0%,var(--bg) 60%);}
+
+/* loader */
+#loader{
+  position:fixed;inset:0;z-index:10000;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#loader.hide{opacity:0;visibility:hidden;}
+.loader-initials{
+  font-size:4rem;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan),var(--amber));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  background-size:300% 100%;
+  animation:shimmer 2.2s linear infinite;
+}
+.loader-bar{width:220px;height:3px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.loader-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan));animation:loadfill 1.9s ease forwards;border-radius:4px;}
+@keyframes loadfill{from{width:0%;}to{width:100%;}}
+@keyframes shimmer{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+
+/* navbar */
+header{
+  position:fixed;top:0;left:0;width:100%;z-index:100;
+  padding:16px 6%;display:flex;justify-content:space-between;align-items:center;
+  background:rgba(10,10,18,.55);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);
+  transform:translateY(-100%);animation:navdrop .8s .4s ease forwards;
+}
+@keyframes navdrop{to{transform:translateY(0);}}
+.logo{font-size:1.15rem;font-weight:700;letter-spacing:.5px;}
+.logo span{color:var(--pink);}
+nav ul{display:flex;gap:34px;list-style:none;}
+nav a{color:var(--text);text-decoration:none;font-size:.92rem;position:relative;padding-bottom:6px;}
+nav a::after{content:'';position:absolute;left:0;bottom:0;height:1.5px;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .3s ease;}
+nav a:hover::after{width:100%;}
+.nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.nav-toggle span{width:24px;height:2px;background:var(--text);}
+
+section{position:relative;z-index:1;padding:120px 6% 90px;}
+.section-tag{color:var(--cyan);font-size:.85rem;font-weight:500;margin-bottom:10px;}
+.section-title{font-size:2.1rem;font-weight:700;margin-bottom:50px;}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease;}
+.reveal.left{transform:translateX(-50px);}
+.reveal.right{transform:translateX(50px);}
+.reveal.in{opacity:1;transform:translate(0,0);}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:100px;}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center;width:100%;}
+.tag-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);padding:7px 14px;border-radius:30px;font-size:.82rem;color:var(--muted);margin-bottom:26px;}
+.tag-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-name{font-size:4.3rem;font-weight:800;line-height:1.05;margin-bottom:18px;}
+.shimmer-text{
+  background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan),var(--amber),var(--indigo));
+  background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shimmer 5s linear infinite;
+}
+.hero-sub{font-size:1.2rem;color:var(--muted);margin-bottom:34px;max-width:480px;}
+.cta-row{display:flex;gap:16px;flex-wrap:wrap;}
+.btn{padding:14px 28px;border-radius:8px;font-weight:600;font-size:.92rem;text-decoration:none;display:inline-block;transition:transform .25s,box-shadow .25s;}
+.btn-primary{background:linear-gradient(90deg,var(--indigo),var(--pink));color:#fff;}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(255,61,154,.35);}
+.btn-outline{border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 10px 30px rgba(45,227,214,.2);}
+
+.hero-right{position:relative;display:flex;align-items:center;justify-content:center;height:420px;}
+.orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--indigo),transparent 70%);filter:blur(40px);opacity:.5;animation:orbfloat 6s ease-in-out infinite;}
+@keyframes orbfloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-20px) scale(1.07);}}
+.float-card{
+  position:relative;width:280px;background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:34px 26px;text-align:center;backdrop-filter:blur(10px);
+  animation:cardfloat 5s ease-in-out infinite;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+}
+@keyframes cardfloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(1deg);}}
+.avatar-wrap{position:relative;width:110px;height:110px;margin:0 auto 18px;}
+.avatar-ring{position:absolute;inset:0;border:2px dashed var(--cyan);border-radius:50%;animation:spin 8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.avatar-initials{position:absolute;inset:10px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem;}
+.float-card h3{font-size:1.15rem;margin-bottom:2px;}
+.float-card .role{color:var(--muted);font-size:.85rem;margin-bottom:20px;}
+.stat-row{display:flex;justify-content:space-around;border-top:1px solid var(--border);padding-top:16px;}
+.stat-row div{display:flex;flex-direction:column;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:700;color:var(--amber);font-size:1.15rem;}
+.stat-label{font-size:.68rem;color:var(--muted);}
+
+/* marquee */
+.marquee-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:22px 0;background:rgba(255,255,255,.02);}
+.marquee{display:flex;gap:60px;white-space:nowrap;animation:marquee 22s linear infinite;width:max-content;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.marquee span{font-family:'Syne',sans-serif;font-size:1rem;color:var(--muted);letter-spacing:1px;}
+.marquee span b{color:var(--text);}
+
+/* skills */
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;}
+.skill-item{margin-bottom:26px;}
+.skill-top{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.9rem;}
+.skill-track{height:9px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden;}
+.skill-fill{height:100%;width:0%;border-radius:6px;position:relative;background:linear-gradient(90deg,var(--indigo),var(--cyan));transition:width 1.4s cubic-bezier(.16,1,.3,1);overflow:hidden;}
+.skill-fill.done::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:sweep 1.2s ease .3s;}
+@keyframes sweep{from{left:-40%;}to{left:110%;}}
+.chip-cloud{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;}
+.chip{border:1px solid var(--border);padding:9px 16px;border-radius:30px;font-size:.85rem;color:var(--text);background:var(--card);transition:transform .25s,border-color .25s,box-shadow .25s;}
+.chip:hover{transform:translateY(-6px);border-color:var(--pink);box-shadow:0 10px 20px rgba(255,61,154,.2);}
+
+/* experience */
+.timeline{position:relative;padding-left:40px;}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--indigo),var(--pink),var(--cyan),var(--amber));}
+.tl-item{position:relative;margin-bottom:38px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 28px;transition:transform .3s,box-shadow .3s;}
+.tl-item::before{content:'';position:absolute;left:-40px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 4px rgba(255,61,154,.2);}
+.tl-item:hover{transform:translateX(10px);box-shadow:0 15px 40px rgba(91,75,214,.25);}
+.tl-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.tl-head h3{font-size:1.15rem;}
+.tl-date{color:var(--amber);font-size:.82rem;font-weight:500;}
+.tl-org{color:var(--cyan);font-size:.88rem;margin-bottom:12px;}
+.tl-item ul{margin-left:18px;color:var(--muted);font-size:.9rem;line-height:1.7;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.badge{font-size:.72rem;padding:5px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted);}
+
+/* projects */
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+.proj-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px 24px;overflow:hidden;transition:transform .35s,box-shadow .35s;}
+.proj-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:3px;background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan));transition:left .5s ease;}
+.proj-card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,.5);}
+.proj-card:hover::before{left:0;}
+.proj-emoji{font-size:2.1rem;margin-bottom:16px;display:block;}
+.proj-card h3{font-size:1.1rem;margin-bottom:10px;}
+.proj-card p{color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:18px;}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;}
+.tag-row span{font-size:.72rem;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--cyan);}
+
+/* education */
+.edu-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:26px;}
+.edu-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px;}
+.edu-card h3{font-size:1.15rem;margin-bottom:6px;}
+.edu-card .org{color:var(--cyan);font-size:.9rem;margin-bottom:14px;}
+.edu-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);padding-top:14px;margin-top:6px;}
+.gpa{color:var(--amber);font-weight:700;font-family:'Syne',sans-serif;}
+.lang-badges{display:flex;flex-direction:column;gap:16px;}
+.lang-badge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;}
+.lang-name{font-weight:600;}
+.lang-level{font-size:.75rem;padding:5px 12px;border-radius:20px;background:linear-gradient(90deg,var(--indigo),var(--cyan));color:#fff;font-weight:600;animation:badgepulse 2.4s ease-in-out infinite;}
+@keyframes badgepulse{0%,100%{box-shadow:0 0 0 rgba(45,227,214,0);}50%{box-shadow:0 0 14px rgba(45,227,214,.5);}}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;}
+.contact-card{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:16px;transition:transform .3s,border-color .3s;}
+.contact-card:hover{transform:translateX(12px);border-color:var(--cyan);}
+.contact-icon{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--pink));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.contact-card .lbl{font-size:.75rem;color:var(--muted);}
+.contact-card .val{font-size:.95rem;font-weight:500;}
+.ripple-wrap{position:relative;width:220px;height:220px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+.ripple{position:absolute;border-radius:50%;border:1.5px solid var(--cyan);animation:ripple 3s ease-out infinite;}
+.ripple:nth-child(2){animation-delay:1s;}
+.ripple:nth-child(3){animation-delay:2s;}
+@keyframes ripple{0%{width:80px;height:80px;opacity:.8;}100%{width:220px;height:220px;opacity:0;}}
+.center-avatar{position:relative;width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--pink),var(--amber));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;animation:avatarpulse 2.4s ease-in-out infinite;z-index:2;}
+@keyframes avatarpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+
+footer{text-align:center;padding:30px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);position:relative;z-index:1;}
+
+@media(max-width:900px){
+  nav ul{display:none;}
+  .nav-toggle{display:flex;}
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-right{margin-top:40px;height:300px;}
+  .hero-name{font-size:2.6rem;}
+  .skills-grid,.proj-grid,.edu-grid,.contact-grid{grid-template-columns:1fr;}
+  section{padding:90px 6% 60px;}
+}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<canvas id="particles"></canvas>
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<div id="loader">
+  <div class="loader-initials">NA</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<header>
+  <div class="logo">Noureldin <span>Ahmed</span></div>
+  <nav><ul>
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul></nav>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="tag-pill"><span class="dot"></span>Available for Junior DevOps roles</div>
+      <h1 class="hero-name">Noureldin<br><span class="shimmer-text">Ahmed</span></h1>
+      <p class="hero-sub">Cloud & DevOps Engineer — building secure, automated infrastructure on AWS, Docker, Kubernetes and Terraform, with a DevSecOps mindset.</p>
+      <div class="cta-row">
+        <a href="#contact" class="btn btn-primary">Get in touch</a>
+        <a href="#experience" class="btn btn-outline">View experience</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="orb"></div>
+      <div class="float-card">
+        <div class="avatar-wrap">
+          <div class="avatar-ring"></div>
+          <div class="avatar-initials">NA</div>
+        </div>
+        <h3>Noureldin Ahmed</h3>
+        <div class="role">Cloud & DevOps Engineer</div>
+        <div class="stat-row">
+          <div><span class="stat-num">3.47</span><span class="stat-label">CGPA / 4.0</span></div>
+          <div><span class="stat-num">5+</span><span class="stat-label">Trainings</span></div>
+          <div><span class="stat-num">2026</span><span class="stat-label">Graduate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span><b>NTI</b> DevSecOps</span><span><b>DEPI</b> Cybersecurity</span><span><b>Telecom Egypt (WE)</b> Fiber & Mobile</span>
+    <span><b>Amit Egypt</b> Embedded Systems</span><span><b>IEEE</b> Committee</span><span><b>AWS</b> Cloud Practitioner</span>
+    <span><b>NTI</b> DevSecOps</span><span><b>DEPI</b> Cybersecurity</span><span><b>Telecom Egypt (WE)</b> Fiber & Mobile</span>
+    <span><b>Amit Egypt</b> Embedded Systems</span><span><b>IEEE</b> Committee</span><span><b>AWS</b> Cloud Practitioner</span>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-tag reveal">What I work with</div>
+  <h2 class="section-title reveal">Skills & Technologies</h2>
+  <div class="skills-grid">
+    <div class="reveal left">
+      <div class="skill-item" data-level="80"><div class="skill-top"><span>AWS Cloud (EC2, VPC, IAM, S3, EBS)</span><span>80%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="82"><div class="skill-top"><span>Docker & Containerization</span><span>82%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="70"><div class="skill-top"><span>Kubernetes & Terraform</span><span>70%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="85"><div class="skill-top"><span>Git & CI/CD Workflows</span><span>85%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="78"><div class="skill-top"><span>Linux Administration & Bash</span><span>78%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="65"><div class="skill-top"><span>Python</span><span>65%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+      <div class="skill-item" data-level="75"><div class="skill-top"><span>Networking (TCP/IP, Routing, CCNA)</span><span>75%</span></div><div class="skill-track"><div class="skill-fill"></div></div></div>
+    </div>
+    <div class="reveal right">
+      <h3 style="margin-bottom:16px;font-size:1.1rem;">Full tech stack</h3>
+      <div class="chip-cloud">
+        <div class="chip">AWS</div><div class="chip">EC2</div><div class="chip">VPC</div><div class="chip">IAM</div><div class="chip">S3</div><div class="chip">EBS</div>
+        <div class="chip">Docker</div><div class="chip">Git</div><div class="chip">GitHub</div><div class="chip">CI/CD</div><div class="chip">Terraform</div><div class="chip">Kubernetes</div>
+        <div class="chip">Python</div><div class="chip">Bash</div><div class="chip">Linux</div><div class="chip">Windows</div>
+        <div class="chip">TCP/IP</div><div class="chip">DNS</div><div class="chip">DHCP</div><div class="chip">CCNA</div><div class="chip">Network+</div>
+        <div class="chip">TensorFlow</div><div class="chip">Keras</div><div class="chip">GNU Radio</div><div class="chip">PCB Design</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-tag reveal">Career path</div>
+  <h2 class="section-title reveal">Experience & Practical Training</h2>
+  <div class="timeline">
+    <div class="tl-item reveal left">
+      <div class="tl-head"><h3>Professional DevSecOps Engineer Training</h3><span class="tl-date">07/2026 – 10/2026</span></div>
+      <div class="tl-org">NTI · Egypt</div>
+      <ul>
+        <li>Built and managed Linux-based environments while practicing system administration, Bash scripting, and troubleshooting.</li>
+        <li>Worked with Git, Docker, AWS cloud services, and CI/CD workflows to understand modern DevOps practices.</li>
+        <li>Applied DevSecOps principles by integrating security considerations into development, deployment, and infrastructure workflows.</li>
+        <li>Practiced cloud infrastructure concepts including EC2, VPC, IAM, S3, EBS, and Security Groups.</li>
+      </ul>
+      <div class="badge-row"><span class="badge">DevSecOps</span><span class="badge">AWS</span><span class="badge">Docker</span><span class="badge">CI/CD</span></div>
+    </div>
+    <div class="tl-item reveal left">
+      <div class="tl-head"><h3>Vulnerability Analyst & Penetration Tester</h3><span class="tl-date">06/2025 – 12/2025</span></div>
+      <div class="tl-org">DEPI · Infrastructure and Security</div>
+      <ul>
+        <li>Performed vulnerability assessment and penetration testing of web applications and systems in controlled environments.</li>
+        <li>Practiced Linux, networking, reconnaissance, enumeration, and exploitation techniques in security-focused lab environments.</li>
+      </ul>
+      <div class="badge-row"><span class="badge">VAPT</span><span class="badge">Linux</span><span class="badge">Networking</span></div>
+    </div>
+    <div class="tl-item reveal left">
+      <div class="tl-head"><h3>Fiber Optics & Mobile Package Training</h3><span class="tl-date">09/2025 – 10/2025</span></div>
+      <div class="tl-org">Telecom Egypt (WE)</div>
+      <ul>
+        <li>Gained hands-on experience in fiber optic transmission, optical networks, and mobile communication technologies, including basic installation, testing, and troubleshooting.</li>
+      </ul>
+      <div class="badge-row"><span class="badge">Fiber Optics</span><span class="badge">Telecom</span></div>
+    </div>
+    <div class="tl-item reveal left">
+      <div class="tl-head"><h3>CCNA Fundamentals Training</h3><span class="tl-date">07/2024 – 08/2024</span></div>
+      <div class="tl-org">Telecom Egypt (WE)</div>
+      <ul>
+        <li>Networking basics, routing, switching, and Cisco systems configuration.</li>
+      </ul>
+      <div class="badge-row"><span class="badge">CCNA</span><span class="badge">Routing</span><span class="badge">Switching</span></div>
+    </div>
+    <div class="tl-item reveal left">
+      <div class="tl-head"><h3>Embedded Systems & PCB Design Training</h3><span class="tl-date">09/2023 – 10/2023</span></div>
+      <div class="tl-org">Amit Egypt</div>
+      <ul>
+        <li>Gained practical experience in embedded systems development and PCB design, including microcontroller programming, circuit design, and hardware troubleshooting.</li>
+      </ul>
+      <div class="badge-row"><span class="badge">Embedded Systems</span><span class="badge">PCB Design</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-tag reveal">Selected work</div>
+  <h2 class="section-title reveal">Projects</h2>
+  <div class="proj-grid">
+    <div class="proj-card reveal">
+      <span class="proj-emoji">📡</span>
+      <h3>AI-Driven Spectrum Management for Cognitive Radio Networks</h3>
+      <p>Graduation project (Excellent). Built an AI-based spectrum sensing system with CNN-based signal classification to detect and classify wireless activity in dynamic environments, using real-time RF acquisition with USRP hardware.</p>
+      <div class="tag-row"><span>Python</span><span>TensorFlow/Keras</span><span>GNU Radio</span><span>USRP</span></div>
+    </div>
+    <div class="proj-card reveal">
+      <span class="proj-emoji">🛡️</span>
+      <h3>Web Application Vulnerability Assessment</h3>
+      <p>Performed vulnerability assessment and penetration testing on web applications and systems in controlled lab environments, covering reconnaissance, enumeration, and exploitation techniques.</p>
+      <div class="tag-row"><span>Linux</span><span>Networking</span><span>Pentesting</span></div>
+    </div>
+    <div class="proj-card reveal">
+      <span class="proj-emoji">☁️</span>
+      <h3>Cloud Infrastructure & CI/CD Practice</h3>
+      <p>Practiced provisioning and securing cloud infrastructure — EC2, VPC, IAM, S3, EBS, and Security Groups — alongside Docker and CI/CD workflows during DevSecOps training.</p>
+      <div class="tag-row"><span>AWS</span><span>Docker</span><span>Terraform</span><span>Kubernetes</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-tag reveal">Background</div>
+  <h2 class="section-title reveal">Education & Languages</h2>
+  <div class="edu-grid">
+    <div class="edu-card reveal left">
+      <h3>B.Sc. in Electronics & Communications Engineering</h3>
+      <div class="org">Misr University for Science and Technology</div>
+      <p style="color:var(--muted);font-size:.9rem;">Graduation project: AI-Driven Spectrum Management for Cognitive Radio Networks — rated Excellent.</p>
+      <div class="edu-meta"><span>10/2021 – 07/2026</span><span class="gpa">CGPA 3.47 / 4.00</span></div>
+    </div>
+    <div class="reveal right">
+      <div class="lang-badges">
+        <div class="lang-badge"><span class="lang-name">Arabic</span><span class="lang-level">Native</span></div>
+        <div class="lang-badge"><span class="lang-name">English</span><span class="lang-level">Excellent</span></div>
+      </div>
+      <div class="edu-card" style="margin-top:16px;">
+        <h3 style="font-size:1rem;">IEEE — Committee</h3>
+        <div class="org">Embedded Systems & AI · 10/2023</div>
+        <p style="color:var(--muted);font-size:.85rem;">Participated in workshops, team projects, and embedded systems design.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-tag reveal">Let's talk</div>
+  <h2 class="section-title reveal">Get in Touch</h2>
+  <div class="contact-grid">
+    <div class="reveal left">
+      <div class="contact-card"><div class="contact-icon">✉️</div><div><div class="lbl">Email</div><div class="val">nourahmeed89@gmail.com</div></div></div>
+      <div class="contact-card"><div class="contact-icon">📞</div><div><div class="lbl">Phone</div><div class="val">+20 111 243 7244</div></div></div>
+      <div class="contact-card"><div class="contact-icon">📍</div><div><div class="lbl">Location</div><div class="val">Cairo, Egypt</div></div></div>
+      <div class="contact-card"><div class="contact-icon">💼</div><div><div class="lbl">Status</div><div class="val">Available · Postponed military status</div></div></div>
+    </div>
+    <div class="reveal right">
+      <div class="ripple-wrap">
+        <div class="ripple"></div><div class="ripple"></div><div class="ripple"></div>
+        <div class="center-avatar">NA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Noureldin Ahmed Abdelaziz — Cloud & DevOps Engineer, Cairo, Egypt</footer>
+
+<script>
+// loader
+window.addEventListener('load',()=>{
+  setTimeout(()=>{document.getElementById('loader').classList.add('hide');},2000);
+});
+
+// custom cursor
+const dot=document.querySelector('.cursor-dot'),ring=document.querySelector('.cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+function animRing(){rx+=(mx-rx)*0.15;ry+=(my-ry)*0.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+animRing();
+document.querySelectorAll('a,button,.chip,.proj-card,.contact-card,.tl-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>ring.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>ring.classList.remove('hover'));
+});
+
+// particle network
+const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const colors=['#5b4bd6','#ff3d9a','#2de3d6','#ffb648'];
+let particles=[];
+const count=Math.min(90,Math.floor(window.innerWidth/14));
+for(let i=0;i<count;i++){
+  particles.push({
+    x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,
+    r:Math.random()*2+1,c:colors[Math.floor(Math.random()*colors.length)]
+  });
+}
+function tick(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let p of particles){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width)p.vx*=-1;
+    if(p.y<0||p.y>canvas.height)p.vy*=-1;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();
+  }
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const a=particles[i],b=particles[j];
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<120){
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle='rgba(255,255,255,'+(0.12*(1-d/120))+')';
+        ctx.lineWidth=1;ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+
+// scroll reveal
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('in'); });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// skill bars
+const skillIo=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const fill=en.target.querySelector('.skill-fill');
+      const level=en.target.getAttribute('data-level');
+      fill.style.width=level+'%';
+      setTimeout(()=>fill.classList.add('done'),1400);
+      skillIo.unobserve(en.target);
+    }
+  });
+},{threshold:.4});
+document.querySelectorAll('.skill-item').forEach(el=>skillIo.observe(el));
+
+// mobile nav toggle placeholder (links still work via anchor scroll)
+</script>
+</body>
+</html>
